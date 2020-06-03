@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <title>Snake</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas class="myCanvas">
+      <p>Add suitable fallback here.</p>
+    </canvas>
+    <script type="text/javascript" src="background.js"></script>
+    <script type="text/javascript" src="score.js"></script>
+    <script type="text/javascript" src="snake.js"></script>
+    <script type="text/javascript" src="food.js"></script>
+    <script>
+
+        const canvas = document.querySelector('.myCanvas');
+        const scale = 50;
+        let width = canvas.width = window.innerWidth;
+        canvas.width = width -= width%scale;
+        let height = canvas.height = window.innerHeight;
+        canvas.height = height -= height%scale;
+        const ctx = canvas.getContext('2d');
+        
+        const rows = height / scale;
+        const cols = width / scale;
+
+        function EndGame(){
+            this.draw = () => {
+                ctx.font = '48px Georgia';
+                ctx.fillStyle = 'rgb(255,255,255)';
+                ctx.textAlign = 'center';
+                ctx.fillText('GAME OVER', width/2, height/2 - scale);
+                ctx.fillText('Hit Enter to Play Again...', width/2, height/2 + scale)
+            }
+        }
+
+        const score = new Score();
+        const background = new Background();
+        const snake = new Snake();
+        const endGame = new EndGame();
+        let food = new Food();
+        let direction;
+        let end = false;
+
+        const game = window.setInterval( () => {
+            if(!end){
+                ctx.clearRect(0,0,width,height);
+                background.draw();
+                //background.gridlines();
+                snake.draw();
+                food.draw();
+                score.draw();
+                snake.update(direction);
+                if(snake.eat(food)){
+                    food = new Food();
+                    score.update();
+                }
+                if(snake.collide()){
+                    score.reset();
+                    end = true;
+                }
+            }
+            if(end){
+                background.draw();
+                endGame.draw();
+            }            
+        }, 150);
+        
+        document.body.onkeypress = (event) => {
+            switch(event.key){
+            case 'w':
+            case '8': 
+                direction = 'up'; break;
+            case 's':
+            case '5': 
+                direction = 'down'; break;
+            case 'a':
+            case '4': 
+                direction = 'left'; break;
+            case 'd':
+            case '6':
+                direction = 'right'; break;
+            case 'Enter':
+                end = false;
+            }
+        };
+    </script>
+  </body>
+</html>
